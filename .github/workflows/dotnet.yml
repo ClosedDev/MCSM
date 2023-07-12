@@ -34,9 +34,9 @@ jobs:
 
     - name: Restore Packages
 
-      run: nuget restore MCServerBuilder.sln
+      run: nuget restore MCServerUtils.sln
 
     - name: Build solution
 
-      run: msbuild MCServerBuilder.sln -t:rebuild -property:Configuration=Release
+      run: msbuild MCServerUtils.sln -t:rebuild -property:Configuration=Release
 
