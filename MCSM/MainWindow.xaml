@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MCSM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MCSM" Height="720" Width="1280" Background="#1e1e1e"
+        Closed="mainWindow_Closed"
+        Closing="mainWindow_Closing">
     <Grid>
         <Frame 
             Name="main_frame"

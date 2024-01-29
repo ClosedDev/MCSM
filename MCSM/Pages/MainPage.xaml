@@ -5,11 +5,13 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:MCSM.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="680" d:DesignWidth="1280"
       Title="MainPage">
 
     <Grid>
-        <Button Content="FuncTest" HorizontalAlignment="Left" VerticalAlignment="Center" Click="Button_Click" Margin="380,0,0,0"/>
-        <Button Content="ShowNewPage" HorizontalAlignment="Left" Margin="290,0,0,0" VerticalAlignment="Center" RenderTransformOrigin="1.004,-0.474" Click="Button_Click_1"/>
+        <Button Content="FuncTest" VerticalAlignment="Top" Click="Button_Click" Margin="1181,644,35,0" Height="20"/>
+        <Button Content="ShowNewPage" Margin="1031,644,146,0" VerticalAlignment="Top" RenderTransformOrigin="1.004,-0.474" Click="Button_Click_1" Height="20"/>
+        <ScrollViewer Margin="0,110,1006,0"/>
+        <Button Content="FuncBukkitVersions" HorizontalAlignment="Left" Margin="909,644,0,0" VerticalAlignment="Top" Height="20" Click="Button_Click_2"/>
     </Grid>
 </Page>
