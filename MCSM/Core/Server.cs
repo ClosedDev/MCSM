@@ -9,6 +9,7 @@ namespace MCSM.Core
 
         public float ramAmount;
         public bool noGUI;
+        public ServerProperties properties;
 
         public Server(string dir, BukkitVersion bukkitVersion)
         {
@@ -45,6 +46,12 @@ namespace MCSM.Core
         public ServerBuilder SetNoGUI(bool noGUI)
         {
             server.noGUI = noGUI;
+            return this;
+        }
+
+        public ServerBuilder SetProperties(ServerProperties properties)
+        {
+            server.properties = properties;
             return this;
         }
 
