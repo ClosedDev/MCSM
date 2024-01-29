@@ -11,36 +11,42 @@ using System.Threading.Tasks;
 
 namespace MCSM.Core
 {
-    public class BukkitVersions
+    public static class BukkitVersions
     {
-        public BukkitVersion[] Versions;
+        static readonly HttpClient client = new();
 
-        private string baseUrl = "https://api.papermc.io/v2/";
+        public static BukkitVersion[] Versions = [];
 
-        public BukkitVersion[] getButtkitVersionsWithAPI(bool getBuild = false)
+        private static string baseUrl = "https://api.papermc.io/v2/";
+
+        public static BukkitVersion[] getButtkitVersionsWithAPI(bool getBuild = false)
         {
-            JToken versions;
+            string[] versions;
 
-            WebRequest request = WebRequest.Create(baseUrl + "projects/paper");
-            request.Method = "GET";
-            request.ContentType = "application/json";
-
-            using (WebResponse response = request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            using (HttpRequestMessage req = new(HttpMethod.Get, string.Format("{0}projects/paper", baseUrl)))
+            using (var response = client.Send(req))
+            using (Stream stream = response.Content.ReadAsStream())
+            using (StreamReader reader = new(stream))
             {
                 string data = reader.ReadToEnd();
                 var obj = JObject.Parse(data);
-                versions = obj["versions"];
+                try
+                {
+                    versions = obj["versions"].Select(v => (string)v).ToArray();
+                } catch (Exception ex)
+                {
+                    Logger.WriteLog(Logger.LogLv.error, ex.StackTrace);
+                    versions = [];
+                }
             }
 
-            List<BukkitVersion> versionList = new List<BukkitVersion>();
+            List<BukkitVersion> versionList = [];
 
             foreach (string version in versions)
             {
-                if (!(version == "1.13-pre7"))
+                if (version != "1.13-pre7")
                 {
-                    if (!(getBuild)) versionList.Add(new BukkitVersion(version));
+                    if (!getBuild) versionList.Add(new BukkitVersion(version));
                     else versionList.Add(getBukkitBuildVersionWithAPI(version));
                 }
             }
@@ -48,24 +54,41 @@ namespace MCSM.Core
             return versionList.ToArray();
         }
 
-        private BukkitVersion getBukkitBuildVersionWithAPI(string bvStr)
+        private static BukkitVersion getBukkitBuildVersionWithAPI(string bvStr)
         {
-            List<string> versions;
+            string[] versions;
 
-            WebRequest request = WebRequest.Create(baseUrl + "projects/paper/versions/" + bvStr);
-            request.Method = "GET";
-            request.ContentType = "application/json";
-
-            using (WebResponse response = request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            using (HttpRequestMessage req = new(HttpMethod.Get, string.Format("{0}projects/paper/versions/{1}", baseUrl, bvStr)))
+            using (var response = client.Send(req))
+            using (Stream stream = response.Content.ReadAsStream())
+            using (StreamReader reader = new(stream))
             {
                 string data = reader.ReadToEnd();
                 var obj = JObject.Parse(data);
-                versions = obj["builds"].Values<string>().ToList();
+                try
+                {
+                    versions = obj["builds"].Select(v => (string)v).ToArray();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLog(Logger.LogLv.error, ex.StackTrace);
+                    versions = [];
+                }
             }
 
             return new BukkitVersion(bvStr, int.Parse(versions.Last()));
+        }
+
+        public static void LoadVersions(bool getBuild = false)
+        {
+            new Thread(() =>
+            {
+                Logger.WriteLog(Logger.LogLv.info, "Loading version information from Paper...");
+
+                Versions = getButtkitVersionsWithAPI(getBuild);
+
+                Logger.WriteLog(Logger.LogLv.info, $"Loaded version information ( Length: {Versions.Length} )");
+            }).Start();
         }
     }
 
