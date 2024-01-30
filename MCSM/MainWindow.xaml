@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:MCSM"
         mc:Ignorable="d"
         Title="MCSM" Height="720" Width="1280" Background="#1e1e1e"
+        Loaded="mainWindow_Loaded"
         Closed="mainWindow_Closed"
         Closing="mainWindow_Closing">
     <Grid>

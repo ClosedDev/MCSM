@@ -3,16 +3,17 @@ using System.IO;
 using System.Windows;
 namespace MCSM.Core
 {
-    public enum LogLv
-    {
-        info = 6,
-        warn = 4,
-        error = 2,
-        fatal = 0
-    }
 
     public class Logger
     {
+        public enum LogLv
+        {
+            info = 6,
+            warn = 4,
+            error = 2,
+            fatal = 0
+        }
+
         static Queue<string> logQueue = new Queue<string>();
         private static readonly object writeLock = new object();
 
@@ -30,7 +31,7 @@ namespace MCSM.Core
 
                     while (logQueue.Count > 0)
                     {
-                        System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);
+                        StackFrame stackFrame = new(1, true);
                         string funcName = stackFrame.GetMethod().Name;
                         string fileName = stackFrame.GetFileName();
                         fileName = Path.GetFileNameWithoutExtension(fileName);
