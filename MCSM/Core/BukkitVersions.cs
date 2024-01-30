@@ -84,10 +84,13 @@ namespace MCSM.Core
             new Thread(() =>
             {
                 Logger.WriteLog(Logger.LogLv.info, "Loading version information from Paper...");
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
                 Versions = getButtkitVersionsWithAPI(getBuild);
 
-                Logger.WriteLog(Logger.LogLv.info, $"Loaded version information ( Length: {Versions.Length} )");
+                stopwatch.Stop();
+                Logger.WriteLog(Logger.LogLv.info, $"Loaded version information ( Length: {Versions.Length} ) ( {stopwatch.ElapsedMilliseconds}ms )");
             }).Start();
         }
     }
