@@ -10,6 +10,7 @@ namespace MCSM.Core
         public float ramAmount;
         public bool noGUI;
         public ServerProperties properties;
+        public List<Plugin> plugin;
 
         public Server(string dir, BukkitVersion bukkitVersion)
         {
@@ -17,7 +18,7 @@ namespace MCSM.Core
             this.bukkitVersion = bukkitVersion;
         }
 
-        public void Create(bool ignoreNotEmpty) // 폴더의 빈 여부를 무시/무시하지 않음
+        public void Create(bool ignoreNotEmpty = false) // 폴더의 빈 여부를 무시/무시하지 않음
         {
             Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + dir + ".");
             if (!ignoreNotEmpty && Directory.GetFiles(dir).Length != 0)
@@ -26,6 +27,8 @@ namespace MCSM.Core
                 Logger.WriteLog(Logger.LogLv.error, "Creating Server Failed.");
                 throw new Exception("Selected directory isn't empty");
             }
+
+            
         }
     }
 
@@ -52,6 +55,12 @@ namespace MCSM.Core
         public ServerBuilder SetProperties(ServerProperties properties)
         {
             server.properties = properties;
+            return this;
+        }
+
+        public ServerBuilder AddPlugin(Plugin plugin)
+        {
+            server.plugin.Append(plugin);
             return this;
         }
 

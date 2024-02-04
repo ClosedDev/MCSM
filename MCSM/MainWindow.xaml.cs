@@ -32,6 +32,7 @@ namespace MCSM
                 this,
                 Wpf.Ui.Appearance.BackgroundType.Mica,
                 true);
+
             BukkitVersions.LoadVersions();
         }
     }
