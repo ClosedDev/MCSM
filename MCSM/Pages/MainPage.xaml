@@ -9,9 +9,11 @@
       Title="MainPage">
 
     <Grid>
-        <Button Content="FuncTest" VerticalAlignment="Top" Click="Button_Click" Margin="1181,644,35,0" Height="20"/>
-        <Button Content="ShowNewPage" Margin="1031,644,146,0" VerticalAlignment="Top" RenderTransformOrigin="1.004,-0.474" Click="Button_Click_1" Height="20"/>
-        <ScrollViewer Margin="0,110,1006,0"/>
-        <Button Content="FuncBukkitVersions" HorizontalAlignment="Left" Margin="909,644,0,0" VerticalAlignment="Top" Height="20" Click="Button_Click_2"/>
+        <Button Content="FuncTest" VerticalAlignment="Top" Click="Button_Click" Margin="1181,630,0,0" Height="34"/>
+        <Button Content="ShowNewPage" Margin="1031,630,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.004,-0.474" Click="Button_Click_1" Height="34"/>
+        <ScrollViewer Margin="0,110,1006,0">
+            <StackPanel Name="ScrollPanel"/>
+        </ScrollViewer>
+        <Button Content="FuncBukkitVersions" Margin="826,630,0,0" VerticalAlignment="Top" Height="37" Click="Button_Click_2"/>
     </Grid>
 </Page>

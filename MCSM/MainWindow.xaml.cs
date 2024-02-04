@@ -28,6 +28,10 @@ namespace MCSM
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            Wpf.Ui.Appearance.Watcher.Watch(
+                this,
+                Wpf.Ui.Appearance.BackgroundType.Mica,
+                true);
             BukkitVersions.LoadVersions();
         }
     }

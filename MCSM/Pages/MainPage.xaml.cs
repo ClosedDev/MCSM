@@ -3,6 +3,7 @@ using Ookii.Dialogs.Wpf;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace MCSM.Pages
 {
@@ -60,7 +61,15 @@ namespace MCSM.Pages
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-
+            ScrollPanel.Children.Add(new TextBlock
+            {
+                Text = "An Text Block",
+                Background = new SolidColorBrush(Color.FromScRgb(1f, 1f, 1f, 1f)),
+                Width = 200f,
+                Height = 30f,
+                TextAlignment = TextAlignment.Center,
+                FontSize = 20f
+            });
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
