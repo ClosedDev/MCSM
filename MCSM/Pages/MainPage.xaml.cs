@@ -74,7 +74,7 @@ namespace MCSM.Pages
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show(Plugin.GetPluginWithVersion(Plugin.SupportPlugin.WORLDEDIT, new BukkitVersion("1.16.4")).info.version.ToString(), "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

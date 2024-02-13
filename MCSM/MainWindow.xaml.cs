@@ -28,6 +28,8 @@ namespace MCSM
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            Core.Core.Load();
+
             Wpf.Ui.Appearance.Watcher.Watch(
                 this,
                 Wpf.Ui.Appearance.BackgroundType.Mica,

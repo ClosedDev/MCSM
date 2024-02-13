@@ -1,25 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using MCSM.Core.Utils;
 
 namespace MCSM.Core
 {
     public static class Core
     {
-        static string EnvironmentAppdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\MCSM";
-        
+        public static IniObject Settings = null;
+        private static string MCSMAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\MCSM";
+        private static string SettingsFile = MCSMAppdata + "\\settings.ini";
+
         public static void Load()
         {
-            if (!Directory.Exists(EnvironmentAppdata))
+            if (!Directory.Exists(MCSMAppdata))
             {
-                Directory.CreateDirectory(EnvironmentAppdata);
-                
+                Directory.CreateDirectory(MCSMAppdata);
             }
 
+            if (!File.Exists(SettingsFile))
+            {
+                Settings = new();
+                File.WriteAllText(SettingsFile, string.Empty);
+            }
 
+            Settings = new IniObject(File.ReadAllText(SettingsFile));
         }
     }
 }
