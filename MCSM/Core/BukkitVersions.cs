@@ -104,6 +104,9 @@ namespace MCSM.Core
         public int Build { get; set; }
         public string VER;
 
+        public string GetDownloadURL()
+        { return $"https://api.papermc.io/v2/projects/paper/versions/{this.VER}/builds/{this.Build}/downloads/{this.VER}"; }
+
         public BukkitVersion(string version, int build = 0)
         {
             string[] versionParts = version.Split('.');
@@ -122,12 +125,6 @@ namespace MCSM.Core
         public override string ToString()
         {
             return $"v{Ver:D2}M{Major:D2}m{Minor:D2}";
-        }
-
-        public void Download()
-        {
-            Logger.WriteLog(Logger.LogLv.info, $"Downloading Bukkit {this.ToString}");
-            string url = $"https://api.papermc.io/v2/projects/paper/versions/{this.VER}/builds/{this.Build}/downloads/{this.VER}";
         }
     }
 }

@@ -29,7 +29,8 @@ namespace MCSM.Core
             }
 
             Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
-            this.bukkitVersion.Download();
+                
+
         }
     }
 
