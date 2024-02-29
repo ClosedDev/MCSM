@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace MCSM.Core
 {
@@ -121,6 +122,12 @@ namespace MCSM.Core
         public override string ToString()
         {
             return $"v{Ver:D2}M{Major:D2}m{Minor:D2}";
+        }
+
+        public void Download()
+        {
+            Logger.WriteLog(Logger.LogLv.info, $"Downloading Bukkit {this.ToString}");
+            string url = $"https://api.papermc.io/v2/projects/paper/versions/{this.VER}/builds/{this.Build}/downloads/{this.VER}";
         }
     }
 }

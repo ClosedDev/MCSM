@@ -28,7 +28,8 @@ namespace MCSM.Core
                 throw new Exception("Selected directory isn't empty");
             }
 
-            
+            Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
+            this.bukkitVersion.Download();
         }
     }
 

@@ -43,6 +43,8 @@ namespace MCSM.Core
         static readonly HttpClient client = new();
         public static Plugin? GetPluginWithVersion(SupportPlugin type, BukkitVersion bukkitVersion)
         {
+            Logger.WriteLog(Logger.LogLv.info, "Loading plugin version information from MCSM Plugin API...");
+
             string ver = string.Format("{0}.{1}", bukkitVersion.Ver, bukkitVersion.Major);
 
             using (HttpRequestMessage req = new(HttpMethod.Get, string.Format("{0}plugins/{1}", "http://mcsm.closeddev.kro.kr/", PluginInfo.plugins[type].Item1.ToLower().Replace(" ", "-"))))
@@ -65,7 +67,6 @@ namespace MCSM.Core
                             return new Plugin(new PluginInfo(PluginType.SUPPORT, "", "", element.version, element.date, type));
                         }
                     }
-
                     return null;
                 }
                 catch (Exception ex)
