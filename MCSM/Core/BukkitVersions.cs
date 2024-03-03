@@ -20,7 +20,7 @@ namespace MCSM.Core
 
         private static string baseUrl = "https://api.papermc.io/v2/";
 
-        public static BukkitVersion[] getButtkitVersionsWithAPI(bool getBuild = false)
+        public static BukkitVersion[] getBukkitVersionsWithAPI(bool getBuild = false)
         {
             string[] versions;
 
@@ -55,7 +55,7 @@ namespace MCSM.Core
             return versionList.ToArray();
         }
 
-        private static BukkitVersion getBukkitBuildVersionWithAPI(string bvStr)
+        public static BukkitVersion getBukkitBuildVersionWithAPI(string bvStr)
         {
             string[] versions;
 
@@ -88,7 +88,7 @@ namespace MCSM.Core
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                Versions = getButtkitVersionsWithAPI(getBuild);
+                Versions = getBukkitVersionsWithAPI(getBuild);
 
                 stopwatch.Stop();
                 Logger.WriteLog(Logger.LogLv.info, $"Loaded version information ( Length: {Versions.Length} ) ( {stopwatch.ElapsedMilliseconds}ms )");
@@ -111,20 +111,25 @@ namespace MCSM.Core
         {
             string[] versionParts = version.Split('.');
 
-            Ver = int.Parse(versionParts[0]);
-            Major = int.Parse(versionParts[1]);
+            this.Ver = int.Parse(versionParts[0]);
+            this.Major = int.Parse(versionParts[1]);
 
-            if (!(versionParts.Length == 2)) Minor = int.Parse(versionParts[2]);
-            else Minor = 00;
+            if (!(versionParts.Length == 2)) this.Minor = int.Parse(versionParts[2]);
+            else this.Minor = 00;
 
-            Build = build;
+            this.Build = build;
 
-            VER = version;
+            this.VER = version;
         }
 
         public override string ToString()
         {
-            return $"v{Ver:D2}M{Major:D2}m{Minor:D2}";
+            return $"v{this.Ver:D2}M{this.Major:D2}m{this.Minor:D2}";
+        }
+
+        public void loadBukkitBuildVersion()
+        {
+            this.Build = BukkitVersions.getBukkitBuildVersionWithAPI(this.VER).Build;
         }
     }
 }

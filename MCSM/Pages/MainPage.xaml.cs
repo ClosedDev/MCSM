@@ -42,10 +42,10 @@ namespace MCSM.Pages
                 return;
             }
 
-            ServerBuilder builder = new(dir, BukkitVersions.Versions[0]);
+            ServerBuilder builder = new(dir, new BukkitVersion("1.20.4"));
             Server s = builder
                 .SetNoGUI(true)
-                .SetRAM(4f)
+                .SetRAM(4000)
                 .Build();
 
             MessageBox.Show(s.bukkitVersion.ToString(), "MCSM Core");
@@ -74,7 +74,7 @@ namespace MCSM.Pages
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(Plugin.GetPluginWithVersion(Plugin.SupportPlugin.WORLDEDIT, new BukkitVersion("1.16.4")).info.version.ToString(), "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
+
         }
     }
 }
