@@ -127,7 +127,7 @@ namespace MCSM.Core
             return $"v{this.Ver:D2}M{this.Major:D2}m{this.Minor:D2}";
         }
 
-        public void loadBukkitBuildVersion()
+        public void LoadBukkitBuildVersion()
         {
             this.Build = BukkitVersions.getBukkitBuildVersionWithAPI(this.VER).Build;
         }

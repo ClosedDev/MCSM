@@ -5,6 +5,38 @@ using Newtonsoft.Json;
 
 namespace MCSM.Core
 {
+    public class PluginList
+    {
+        private List<Plugin> list;
+        public PluginList(List<Plugin> preset = null) {
+            list = preset ?? new();
+        }
+        
+        public Plugin this[int i] {
+            get
+            {
+                try
+                {
+                    return list[i];
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            set
+            {
+                list[i] = value;
+            }
+        }
+
+        public void Add(Plugin p)
+        {
+            list.Add(p);
+        }
+    }
+    
     public class Plugin(PluginInfo info)
     {
         public enum PluginType
@@ -64,7 +96,7 @@ namespace MCSM.Core
 
                         if (element.version.Trim().Contains(ver))
                         {
-                            return new Plugin(new PluginInfo(PluginType.SUPPORT, "", "", element.version, element.date, type));
+                            return new Plugin(new PluginInfo(PluginType.SUPPORT, "", "", element.version, element.date, element.url, type));
                         }
                     }
                     return null;
@@ -94,8 +126,10 @@ namespace MCSM.Core
         public string desc;
         public BukkitVersion version;
         public string date;
+        public string dir;
+        public string url;
 
-        public PluginInfo(Plugin.PluginType type, string name, string desc, string version, string date, Plugin.SupportPlugin? support = null)
+        public PluginInfo(Plugin.PluginType type, string name, string desc, string version, string date, string url, Plugin.SupportPlugin? support = null)
         {
             if (type == Plugin.PluginType.SUPPORT && support != null)
             {
@@ -111,6 +145,8 @@ namespace MCSM.Core
             this.type = type;
             this.version = new BukkitVersion(version);
             this.date = date;
+            this.dir = this.name.ToLower().Trim() + ".jar";
+            this.url = url;
         }
     }
 }

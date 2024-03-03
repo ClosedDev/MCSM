@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using MCSM.Core.Utils;
+using Newtonsoft.Json;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -15,7 +17,7 @@ namespace MCSM.Core
         public long ramAmount;
         public bool noGUI;
         public ServerProperties properties;
-        public List<Plugin> plugin;
+        public List<Plugin> plugin = new();
 
         public Server(string dir, BukkitVersion bukkitVersion)
         {
@@ -26,6 +28,9 @@ namespace MCSM.Core
         public async void Create(bool ignoreNotEmpty = false) // 폴더의 빈 여부를 무시/무시하지 않음
         {
             Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + dir + ".");
+            
+            // Pre Settings
+            this.bukkitVersion.LoadBukkitBuildVersion();
             if (!ignoreNotEmpty && Directory.GetFiles(dir).Length != 0)
             {
                 Logger.WriteLog(Logger.LogLv.error, "Selected directory isn't empty in MCSM Core: " + dir + ".");
@@ -33,47 +38,35 @@ namespace MCSM.Core
                 throw new Exception("Selected directory isn't empty");
             }
 
-            this.bukkitVersion.loadBukkitBuildVersion();
-
             Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}-{this.bukkitVersion.Build}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
 
+            // Eula
             File.WriteAllText(dir + @"\eula.txt", "eula=true");
-
-            string noGuiFlag = this.noGUI ? "-nogui" : "";
-
+            
+            // Ini
             var lines = new List<string>();
             lines.Add("[bukkit]");
-            lines.Add($"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {noGuiFlag}");
+            lines.Add($"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {(this.noGUI ? "-nogui" : "")}");
             lines.Add($"builds={this.bukkitVersion.Build}");
-            lines.Add("[plugins]");
-
-            /*this.plugin = new();
-            this.plugin.Add(new Plugin(new PluginInfo(Plugin.PluginType.SUPPORT, "", "", this.bukkitVersion.VER, "", Plugin.SupportPlugin.WORLDEDIT)));
-
-            foreach (var pl in this.plugin)
-            {
-                lines.Add($"{pl.info.}.jar");
-            }*/
-
-
             File.WriteAllLines(dir + @"\info.ini", lines);
-
-            DirectoryInfo di = new(dir + @"\Plugins");
-            di.Create();
-
-            await Task.Run(() =>
+            
+            // Plugin
+            Directory.CreateDirectory(dir + @"\Plugins");
+            this.plugin.Add(Plugin.GetPluginWithVersion(SupportPlugin.WORLDEDIT, this.bukkitVersion));
+            foreach (var element in this.plugin)
             {
-                try
+                if (element.info.type == PluginType.SUPPORT)
                 {
-                    var url = $"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{this.bukkitVersion.Build}/downloads/paper-{this.bukkitVersion.VER}-{this.bukkitVersion.Build}.jar";
-                    Logger.WriteLog(Logger.LogLv.info, url);
-                    var client = new WebClient();
-                    client.DownloadFile(url, dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
-                } catch (Exception ex)
+                    await Downloader.Download(element.info.url, dir + @"\Plugins\" + element.info.dir);
+                } else
                 {
-                    MessageBox.Show($"다운로드 중 알 수 없는 오류가 발생했습니다. : '{ex}'", "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
+                    //TODO file copy
                 }
-            });
+            }
+            File.WriteAllText(dir + @"\Plugins\info.json", JsonConvert.SerializeObject(this.plugin));
+            
+            // Bukkit
+            await Downloader.Download($"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{this.bukkitVersion.Build}/downloads/paper-{this.bukkitVersion.VER}-{this.bukkitVersion.Build}.jar", dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
 
             Logger.WriteLog(Logger.LogLv.info, "DOWNLOAD COMPLETE!");
         }
