@@ -1,5 +1,6 @@
 ﻿using MCSM.Core.Utils;
 using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -25,50 +26,75 @@ namespace MCSM.Core
             this.bukkitVersion = bukkitVersion;
         }
 
-        public async void Create(bool ignoreNotEmpty = false) // 폴더의 빈 여부를 무시/무시하지 않음
+        public async void Create(bool ignoreNotEmpty = false)  // 폴더의 빈 여부를 무시/무시하지 않음
         {
-            Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + dir + ".");
-            
-            // Pre Settings
-            this.bukkitVersion.LoadBukkitBuildVersion();
-            if (!ignoreNotEmpty && Directory.GetFiles(dir).Length != 0)
-            {
-                Logger.WriteLog(Logger.LogLv.error, "Selected directory isn't empty in MCSM Core: " + dir + ".");
-                Logger.WriteLog(Logger.LogLv.error, "Creating Server Failed.");
-                throw new Exception("Selected directory isn't empty");
-            }
+            Stopwatch serverStopWatch = new Stopwatch();
+            serverStopWatch.Start();
 
-            Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}-{this.bukkitVersion.Build}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
-
-            // Eula
-            File.WriteAllText(dir + @"\eula.txt", "eula=true");
-            
-            // Ini
-            var lines = new List<string>();
-            lines.Add("[bukkit]");
-            lines.Add($"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {(this.noGUI ? "-nogui" : "")}");
-            lines.Add($"builds={this.bukkitVersion.Build}");
-            File.WriteAllLines(dir + @"\info.ini", lines);
-            
-            // Plugin
-            Directory.CreateDirectory(dir + @"\Plugins");
-            this.plugin.Add(Plugin.GetPluginWithVersion(SupportPlugin.WORLDEDIT, this.bukkitVersion));
-            foreach (var element in this.plugin)
+            try
             {
-                if (element.info.type == PluginType.SUPPORT)
+                Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + dir + ".");
+
+                // Pre Settings
+                this.bukkitVersion.LoadBukkitBuildVersion();
+                if (!ignoreNotEmpty && Directory.GetFiles(dir).Length != 0)
                 {
-                    await Downloader.Download(element.info.url, dir + @"\Plugins\" + element.info.dir);
-                } else
-                {
-                    //TODO file copy
+                    Logger.WriteLog(Logger.LogLv.error, "Selected directory isn't empty in MCSM Core: " + dir + ".");
+                    Logger.WriteLog(Logger.LogLv.error, "Creating Server Failed.");
+                    throw new Exception("Selected directory isn't empty");
                 }
-            }
-            File.WriteAllText(dir + @"\Plugins\info.json", JsonConvert.SerializeObject(this.plugin));
-            
-            // Bukkit
-            await Downloader.Download($"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{this.bukkitVersion.Build}/downloads/paper-{this.bukkitVersion.VER}-{this.bukkitVersion.Build}.jar", dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
 
-            Logger.WriteLog(Logger.LogLv.info, "DOWNLOAD COMPLETE!");
+                Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}-{this.bukkitVersion.Build}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
+
+                // Eula
+                File.WriteAllText(dir + @"\eula.txt", "eula=true");
+
+                // Ini
+                var lines = new List<string>();
+                lines.Add("[bukkit]");
+                lines.Add($"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {(this.noGUI ? "-nogui" : "")}");
+                lines.Add($"builds={this.bukkitVersion.Build}");
+                File.WriteAllLines(dir + @"\info.ini", lines);
+
+                // Plugin
+                Directory.CreateDirectory(dir + @"\Plugins");
+                this.plugin.Add(Plugin.GetPluginWithVersion(SupportPlugin.WORLDEDIT, this.bukkitVersion));
+                foreach (var element in this.plugin)
+                {
+                    if (element.info.type == PluginType.SUPPORT)
+                    {
+                        await Downloader.Download(element.info.url, dir + @"\Plugins\" + element.info.dir);
+                    }
+                    else
+                    {
+                        //TODO: 선택되어있는 사용자 지정 플러그인 파일 복사
+                    }
+                }
+                File.WriteAllText(dir + @"\Plugins\info.json", JsonConvert.SerializeObject(this.plugin));
+
+                // Bukkit
+                var url = $"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{this.bukkitVersion.Build}/downloads/paper-{this.bukkitVersion.VER}-{this.bukkitVersion.Build}.jar";
+                Logger.WriteLog(Logger.LogLv.info, $"[ CREATE SERVER ] Downloading bukkit... : {url}");
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                await Downloader.Download(url, dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
+                stopwatch.Stop();
+
+                Logger.WriteLog(Logger.LogLv.info, $"[ CREATE SERVER ] Download Complete ( {stopwatch.ElapsedMilliseconds}ms )");
+
+                // Checking
+                var iniText = File.ReadAllText(dir + @"\info.ini");
+                IniObject ini = new(iniText);
+
+                Logger.WriteLog(Logger.LogLv.info, $"Running Server with argment: java {ini["bukkit"]["argment"]}");
+            } catch (Exception e)
+            {
+                serverStopWatch.Stop();
+
+                Logger.WriteLog(Logger.LogLv.error, $"[ CREATE SERVER ] Create Server is ended with error!: {e}");
+                MessageBox.Show($"알 수 없는 오류가 발생했습니다. : '{e}'", "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 

@@ -17,7 +17,7 @@ namespace MCSM.Core.Utils
             {
                 try
                 {
-                    Logger.WriteLog(Logger.LogLv.info, url);
+                    Logger.WriteLog(Logger.LogLv.info, "Downloading.." + url);
                     using (HttpClient httpClient = new HttpClient())
                     {
                         var result = await httpClient.GetAsync(url);
@@ -32,7 +32,7 @@ namespace MCSM.Core.Utils
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (HttpRequestException ex)
                 {
                     MessageBox.Show($"다운로드 중 알 수 없는 오류가 발생했습니다. : '{ex}'", "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
                 }

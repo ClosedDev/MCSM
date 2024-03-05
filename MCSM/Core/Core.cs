@@ -6,11 +6,15 @@ namespace MCSM.Core
     public static class Core
     {
         public static IniObject Settings = null;
-        private static string MCSMAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\MCSM";
+        public static string MCSMAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MCSM\";
         private static string SettingsFile = MCSMAppdata + "\\settings.ini";
 
         public static void Load()
         {
+            BukkitVersions.LoadVersions();
+
+            JavaManagement.javaBuildVersions = JavaManagement.getJavaVersions();
+
             if (!Directory.Exists(MCSMAppdata))
             {
                 Directory.CreateDirectory(MCSMAppdata);

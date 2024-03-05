@@ -50,13 +50,7 @@ namespace MCSM.Pages
 
             MessageBox.Show(s.bukkitVersion.ToString(), "MCSM Core");
 
-            try
-            {
-                s.Create(false);
-            } catch (Exception ex)
-            {
-                MessageBox.Show($"알 수 없는 오류가 발생했습니다. : '{ex}'", "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            s.Create(false);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -74,7 +68,9 @@ namespace MCSM.Pages
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-
+            Java java = new(19);
+            Logger.WriteLog(Logger.LogLv.info, java.BuildVer);
+            java.Download();
         }
     }
 }
