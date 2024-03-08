@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using static System.Net.WebRequestMethods;
 
 namespace MCSM.Core
@@ -18,9 +19,9 @@ namespace MCSM.Core
         static readonly HttpClient client = new();
         static readonly string baseUrl = "https://api.adoptium.net/v3/";
 
-        public static List<string> javaBuildVersions = new();
+        public static string[] javaBuildVersions;
        
-        public static List<string> getJavaVersions()
+        public static void LoadJavaVersions()
         {
             List<string> buildVersionsList = new();
 
@@ -30,22 +31,23 @@ namespace MCSM.Core
             {
                 try
                 {
-                    using (HttpRequestMessage req = new(HttpMethod.Get, string.Format("{0}info/release_names?architecture=x64&heap_size=normal&image_type=jdk&os=windows&page={1}&page_size=20&project=jdk&release_type=ga&semver=false&sort_method=DEFAULT&sort_order=DESC&vendor=eclipse", baseUrl, i)))
-                    using (var response = client.Send(req))
-                    using (Stream stream = response.Content.ReadAsStream())
-                    using (StreamReader reader = new(stream))
+                    var data = APIManager.Get(string.Format(
+                        "{0}info/release_names?architecture=x64&heap_size=normal&image_type=jdk&os=windows&page={1}&page_size=20&project=jdk&release_type=ga&semver=false&sort_method=DEFAULT&sort_order=DESC&vendor=eclipse",
+                        baseUrl, i));
+                    if (data == string.Empty)
                     {
-                        string data = reader.ReadToEnd();
-                        var obj = JObject.Parse(data);
-                        try
-                        {
-                            buildVersionsList.AddRange(obj["releases"].Values<string>().ToList<string>());
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.WriteLog(Logger.LogLv.error, ex.StackTrace);
-                            buildVersionsList = [];
-                        }
+                        break;
+                    }
+                    
+                    var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(data);
+                    try
+                    {
+                        buildVersionsList.AddRange(JsonConvert.DeserializeObject<string[]>(obj["releases"].ToString()));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteLog(Logger.LogLv.error, ex.ToString() + ":" + ex.StackTrace);
+                        buildVersionsList = [];
                     }
 
                     i++;
@@ -55,7 +57,7 @@ namespace MCSM.Core
                 }
             }
 
-            return buildVersionsList;
+            javaBuildVersions = buildVersionsList.ToArray();
         }
 
         public static String getLatestBuild(int majorVersion)
@@ -118,7 +120,7 @@ namespace MCSM.Core
 
         public async Task Run(string argments, string dir)
         {
-            if (isAvailableToRun())
+            if (CheckAvailableToRun())
             {
                 ProcessStartInfo start = new ProcessStartInfo();
                 start.FileName = Core.MCSMAppdata + @$"jdks\{this.BuildVer}\bin\javaw.exe";
@@ -142,12 +144,6 @@ namespace MCSM.Core
             else throw new Exception("This Java is not available to Run.");
         }
 
-        public async Task<string> GetJavaPrintLineAsync()
-        {
-            StreamReader reader = p.StandardOutput;
-            return await reader.ReadToEndAsync();
-        }
-
         public void InputString(string input)
         {
             StreamWriter myStreamWriter = p.StandardInput;
@@ -161,7 +157,7 @@ namespace MCSM.Core
             ZipFile.ExtractToDirectory(Core.MCSMAppdata + $@"jdks\{this.BuildVer}.zip", Core.MCSMAppdata + $@"jdks\");
         }
 
-        public bool isAvailableToRun()
+        public bool CheckAvailableToRun()
         {
             Logger.WriteLog(Logger.LogLv.info, $"{Core.MCSMAppdata + @$"jdks\{this.BuildVer}\bin\javaw.exe"}");
             if (System.IO.File.Exists(Core.MCSMAppdata + @$"jdks\{this.BuildVer}\bin\javaw.exe")) return true;

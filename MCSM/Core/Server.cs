@@ -36,7 +36,7 @@ namespace MCSM.Core
                 Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + this.dir + ".");
 
                 // Pre Settings
-                this.bukkitVersion.LoadBukkitBuildVersion();
+                var build = BukkitBuild.GetBuild(bukkitVersion);
                 if (!ignoreNotEmpty && Directory.GetFiles(this.dir).Length != 0)
                 {
                     Logger.WriteLog(Logger.LogLv.error, "Selected directory isn't empty in MCSM Core: " + this.dir + ".");
@@ -44,7 +44,7 @@ namespace MCSM.Core
                     throw new Exception("Selected directory isn't empty");
                 }
 
-                Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}-{this.bukkitVersion.Build}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
+                Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}-{build.Build}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
 
                 // Eula
                 File.WriteAllText(this.dir + @"\eula.txt", "eula=true");
@@ -53,7 +53,7 @@ namespace MCSM.Core
                 var lines = new List<string>();
                 lines.Add("[bukkit]");
                 lines.Add($@"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {(this.noGUI ? "-nogui" : "")}");
-                lines.Add($"builds={this.bukkitVersion.Build}");
+                lines.Add($"builds={build.Build}");
                 File.WriteAllLines(this.dir + @"\info.ini", lines);
 
                 // Plugin
@@ -73,7 +73,7 @@ namespace MCSM.Core
                 File.WriteAllText(this.dir + @"\Plugins\info.json", JsonConvert.SerializeObject(this.plugin));
 
                 // Bukkit
-                var url = $"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{this.bukkitVersion.Build}/downloads/paper-{this.bukkitVersion.VER}-{this.bukkitVersion.Build}.jar";
+                var url = $"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{build.Build}/downloads/paper-{this.bukkitVersion.VER}-{build.Build}.jar";
                 Logger.WriteLog(Logger.LogLv.info, $"[ CREATE SERVER ] Downloading bukkit... : {url}");
 
                 Stopwatch stopwatch = new Stopwatch();

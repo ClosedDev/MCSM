@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using MCSM.Core.Utils;
 using MCSM.Pages;
 
@@ -14,9 +15,33 @@ namespace MCSM.Core
 
         public static void Load()
         {
-            BukkitVersions.LoadVersions();
+            Task.Run(() =>
+            {
+                Logger.WriteLog(Logger.LogLv.info, "Loading version information from Paper...");
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                
+                BukkitVersionManagement.LoadBukkitVersions();
 
-            JavaManagement.javaBuildVersions = JavaManagement.getJavaVersions();
+                stopwatch.Stop();
+                Logger.WriteLog(Logger.LogLv.info,
+                    $"Loaded Paper version information ( Length: {BukkitVersionManagement.BukkitVersions.Length} ) ( {stopwatch.ElapsedMilliseconds}ms )");
+            });
+            
+            Task.Run(() =>
+            {
+                Logger.WriteLog(Logger.LogLv.info, "Loading version information from Adoptium...");
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                
+                JavaManagement.LoadJavaVersions();
+
+                stopwatch.Stop();
+                Logger.WriteLog(Logger.LogLv.info,
+                    $"Loaded Java version information ( Length: {JavaManagement.javaBuildVersions.Length} ) ( {stopwatch.ElapsedMilliseconds}ms )");
+            });
+
+            
 
             if (!Directory.Exists(MCSMAppdata))
             {
