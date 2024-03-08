@@ -1,9 +1,10 @@
-﻿<Page x:Class="MCSM.Pages.MainPage"
+﻿<Page
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:MCSM.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" x:Class="MCSM.Pages.MainPage"
       mc:Ignorable="d" 
       d:DesignHeight="680" d:DesignWidth="1280"
       Title="MainPage">
@@ -12,8 +13,12 @@
         <Button Content="FuncTest" VerticalAlignment="Top" Click="Button_Click" Margin="1181,630,0,0" Height="34"/>
         <Button Content="ShowNewPage" Margin="1031,630,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.004,-0.474" Click="Button_Click_1" Height="34"/>
         <ScrollViewer Margin="0,110,1006,0">
-            <StackPanel Name="ScrollPanel"/>
+            <StackPanel x:Name="ScrollPanel"/>
         </ScrollViewer>
-        <Button Content="FuncBukkitVersions" Margin="826,630,0,0" VerticalAlignment="Top" Height="37" Click="Button_Click_2"/>
+        <Button Content="FuncBukkitVersions" Margin="826,630,0,0" VerticalAlignment="Top" Height="37"/>
+        <ui:TextBox x:Name="tbx" KeyDown="TextBox_TextEntered" HorizontalAlignment="Left" Margin="298,532,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="923"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="440,10,19,170">
+            <TextBlock x:Name="TextView" Text="" Background="Transparent" Foreground="White" />
+        </ScrollViewer>
     </Grid>
 </Page>

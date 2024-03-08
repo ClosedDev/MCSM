@@ -33,13 +33,13 @@ namespace MCSM.Core
 
             try
             {
-                Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + dir + ".");
+                Logger.WriteLog(Logger.LogLv.info, "Creating Server in: " + this.dir + ".");
 
                 // Pre Settings
                 this.bukkitVersion.LoadBukkitBuildVersion();
-                if (!ignoreNotEmpty && Directory.GetFiles(dir).Length != 0)
+                if (!ignoreNotEmpty && Directory.GetFiles(this.dir).Length != 0)
                 {
-                    Logger.WriteLog(Logger.LogLv.error, "Selected directory isn't empty in MCSM Core: " + dir + ".");
+                    Logger.WriteLog(Logger.LogLv.error, "Selected directory isn't empty in MCSM Core: " + this.dir + ".");
                     Logger.WriteLog(Logger.LogLv.error, "Creating Server Failed.");
                     throw new Exception("Selected directory isn't empty");
                 }
@@ -47,30 +47,30 @@ namespace MCSM.Core
                 Logger.WriteLog(Logger.LogLv.info, $"Bukkit Version: {this.bukkitVersion.ToString()}-{this.bukkitVersion.Build}, RAM: {this.ramAmount}, NoGUI: {this.noGUI}");
 
                 // Eula
-                File.WriteAllText(dir + @"\eula.txt", "eula=true");
+                File.WriteAllText(this.dir + @"\eula.txt", "eula=true");
 
                 // Ini
                 var lines = new List<string>();
                 lines.Add("[bukkit]");
-                lines.Add($"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {(this.noGUI ? "-nogui" : "")}");
+                lines.Add($@"argment=-Xms{this.ramAmount}M -Xmx{this.ramAmount}M -jar bukkit-{this.bukkitVersion.ToString()}.jar {(this.noGUI ? "-nogui" : "")}");
                 lines.Add($"builds={this.bukkitVersion.Build}");
-                File.WriteAllLines(dir + @"\info.ini", lines);
+                File.WriteAllLines(this.dir + @"\info.ini", lines);
 
                 // Plugin
-                Directory.CreateDirectory(dir + @"\Plugins");
+                Directory.CreateDirectory(this.dir + @"\Plugins");
                 this.plugin.Add(Plugin.GetPluginWithVersion(SupportPlugin.WORLDEDIT, this.bukkitVersion));
                 foreach (var element in this.plugin)
                 {
                     if (element.info.type == PluginType.SUPPORT)
                     {
-                        await Downloader.Download(element.info.url, dir + @"\Plugins\" + element.info.dir);
+                        await Downloader.Download(element.info.url, this.dir + @"\Plugins\" + element.info.dir);
                     }
                     else
                     {
                         //TODO: 선택되어있는 사용자 지정 플러그인 파일 복사
                     }
                 }
-                File.WriteAllText(dir + @"\Plugins\info.json", JsonConvert.SerializeObject(this.plugin));
+                File.WriteAllText(this.dir + @"\Plugins\info.json", JsonConvert.SerializeObject(this.plugin));
 
                 // Bukkit
                 var url = $"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{this.bukkitVersion.Build}/downloads/paper-{this.bukkitVersion.VER}-{this.bukkitVersion.Build}.jar";
@@ -78,16 +78,29 @@ namespace MCSM.Core
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                await Downloader.Download(url, dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
+                await Downloader.Download(url, this.dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
                 stopwatch.Stop();
 
                 Logger.WriteLog(Logger.LogLv.info, $"[ CREATE SERVER ] Download Complete ( {stopwatch.ElapsedMilliseconds}ms )");
 
                 // Checking
-                var iniText = File.ReadAllText(dir + @"\info.ini");
+                var iniText = File.ReadAllText(this.dir + @"\info.ini");
                 IniObject ini = new(iniText);
 
                 Logger.WriteLog(Logger.LogLv.info, $"Running Server with argment: java {ini["bukkit"]["argment"]}");
+
+                Java java = new(17);
+
+                ServerVar.java = java;
+
+                await java.Download();
+                java.Run(ini["bukkit"]["argment"], this.dir);
+
+                /*while (true)
+                {
+                    Logger.WriteLog(Logger.LogLv.info, java.GetJavaPrintLine());
+                }*/
+
             } catch (Exception e)
             {
                 serverStopWatch.Stop();
@@ -134,5 +147,10 @@ namespace MCSM.Core
         {
             return server;
         }
+    }
+
+    public static class ServerVar
+    {
+        public static Java java;
     }
 }

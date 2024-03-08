@@ -85,6 +85,19 @@ namespace MCSM.Core
     {
         public string BuildVer { get; set; }
         public int version { get; set; }
+        private Process p;
+
+        public class ProcessOnOutputEventArgs : EventArgs
+        {
+            public string Text { get; }
+
+            public ProcessOnOutputEventArgs(string text)
+            {
+                Text = text;
+            }
+        }
+
+        public event EventHandler<ProcessOnOutputEventArgs> ProcessOnOutput; 
 
         public Java(int ver) // ver 형식: 17 / 8 / 21... 등
         {
@@ -94,22 +107,64 @@ namespace MCSM.Core
             version = ver;
         }
 
-        public void Run(string argments)
+        private void OutputDataReceivedHandler(object sender, DataReceivedEventArgs e)
         {
-            if (isAvailableToRun()) Process.Start(Core.MCSMAppdata + @$"jdks\jdk-{this.BuildVer}\bin\javaw.exe " + argments);
+            // 이벤트 핸들러 메서드를 이벤트에 등록
+            this.ProcessOnOutput -= Core.mainPage.onProcessOutPut;
+            this.ProcessOnOutput += Core.mainPage.onProcessOutPut;
+
+            ProcessOnOutput?.Invoke(this, new ProcessOnOutputEventArgs(e.Data));
+        }
+
+        public async Task Run(string argments, string dir)
+        {
+            if (isAvailableToRun())
+            {
+                ProcessStartInfo start = new ProcessStartInfo();
+                start.FileName = Core.MCSMAppdata + @$"jdks\{this.BuildVer}\bin\javaw.exe";
+                start.RedirectStandardOutput = true;
+                start.RedirectStandardInput = true;
+                start.CreateNoWindow = true;
+                start.Arguments = argments;
+                start.WorkingDirectory = dir;
+
+                await Task.Run(() =>
+                {
+                    p = Process.Start(start);
+
+                    p.OutputDataReceived -= OutputDataReceivedHandler;
+                    p.OutputDataReceived += OutputDataReceivedHandler;
+
+                    p.BeginOutputReadLine();
+                });
+                
+            }
             else throw new Exception("This Java is not available to Run.");
         }
 
-        public async void Download()
+        public async Task<string> GetJavaPrintLineAsync()
+        {
+            StreamReader reader = p.StandardOutput;
+            return await reader.ReadToEndAsync();
+        }
+
+        public void InputString(string input)
+        {
+            StreamWriter myStreamWriter = p.StandardInput;
+            myStreamWriter.WriteLine(input);
+        }
+
+        public async Task Download()
         {
             var url = $"https://api.adoptium.net/v3/binary/version/{this.BuildVer}/windows/x64/jdk/hotspot/normal/eclipse?project=jdk";
             await Downloader.Download(url, Core.MCSMAppdata + $@"jdks\{this.BuildVer}.zip");
-            ZipFile.ExtractToDirectory(Core.MCSMAppdata + $@"jdks\{this.BuildVer}.zip", Core.MCSMAppdata + $@"jdks\{this.BuildVer}\");
+            ZipFile.ExtractToDirectory(Core.MCSMAppdata + $@"jdks\{this.BuildVer}.zip", Core.MCSMAppdata + $@"jdks\");
         }
 
         public bool isAvailableToRun()
         {
-            if (System.IO.File.Exists(Core.MCSMAppdata + @$"jdks\jdk-{this.BuildVer}\bin\javaw.exe")) return true;
+            Logger.WriteLog(Logger.LogLv.info, $"{Core.MCSMAppdata + @$"jdks\{this.BuildVer}\bin\javaw.exe"}");
+            if (System.IO.File.Exists(Core.MCSMAppdata + @$"jdks\{this.BuildVer}\bin\javaw.exe")) return true;
             else return false;
         }
     }

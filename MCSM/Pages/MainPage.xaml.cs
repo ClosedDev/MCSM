@@ -3,6 +3,7 @@ using Ookii.Dialogs.Wpf;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace MCSM.Pages
@@ -16,6 +17,7 @@ namespace MCSM.Pages
         {
             Logger.WriteLog(Logger.LogLv.info, "The main page is displayed.");
             InitializeComponent();
+            Core.Core.mainPage = this;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -44,7 +46,7 @@ namespace MCSM.Pages
 
             ServerBuilder builder = new(dir, new BukkitVersion("1.20.4"));
             Server s = builder
-                .SetNoGUI(true)
+                .SetNoGUI(false)
                 .SetRAM(4000)
                 .Build();
 
@@ -66,11 +68,27 @@ namespace MCSM.Pages
             });
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        public async Task UpdateUI(string newText)
         {
-            Java java = new(19);
-            Logger.WriteLog(Logger.LogLv.info, java.BuildVer);
-            java.Download();
+            await Dispatcher.InvokeAsync(() =>
+            {
+                TextView.Text = TextView.Text + "\n" + newText;
+            });
+        }
+
+        public void onProcessOutPut(object sender, Java.ProcessOnOutputEventArgs e)
+        {
+            Logger.WriteLog(Logger.LogLv.info, e.Text);
+            UpdateUI(e.Text);
+        }
+
+        private void TextBox_TextEntered(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                ServerVar.java.InputString(tbx.Text);
+                tbx.Text = "";
+            }
         }
     }
 }
