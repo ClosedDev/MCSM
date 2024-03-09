@@ -8,6 +8,7 @@ namespace MCSM.Core
     public static class Core
     {
         public static MainPage mainPage { get; set; }
+        public static Java CurrentRunningJava { get; set; }
 
         public static IniObject Settings = null;
         public static string MCSMAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MCSM\";

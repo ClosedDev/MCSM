@@ -91,7 +91,7 @@ namespace MCSM.Core
 
                 Java java = new(17);
 
-                ServerVar.java = java;
+                Core.CurrentRunningJava = java;
 
                 await java.Download();
                 java.Run(ini["bukkit"]["argment"], this.dir);
@@ -147,10 +147,5 @@ namespace MCSM.Core
         {
             return server;
         }
-    }
-
-    public static class ServerVar
-    {
-        public static Java java;
     }
 }

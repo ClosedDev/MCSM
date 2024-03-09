@@ -76,7 +76,7 @@ namespace MCSM.Pages
             });
         }
 
-        public void onProcessOutPut(object sender, Java.ProcessOnOutputEventArgs e)
+        public void onProcessOutPut(object sender, Java.ProcessOnOutPutEventArgs e)
         {
             Logger.WriteLog(Logger.LogLv.info, e.Text);
             UpdateUI(e.Text);
@@ -86,7 +86,7 @@ namespace MCSM.Pages
         {
             if (e.Key == Key.Return)
             {
-                ServerVar.java.InputString(tbx.Text);
+                Core.Core.CurrentRunningJava.InputString(tbx.Text);
                 tbx.Text = "";
             }
         }

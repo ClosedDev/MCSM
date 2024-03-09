@@ -24,11 +24,7 @@ namespace MCSM.Core
                     return null;
                 }
             }
-
-            set
-            {
-                list[i] = value;
-            }
+            set { list[i] = value; }
         }
 
         public void Add(Plugin p)
@@ -66,11 +62,7 @@ namespace MCSM.Core
             public string date { get; set; }
         }
 
-        private class Root
-        {
-            public Result[] result { get; set; }
-        }
-
+        private class Root { public Result[] result { get; set; } }
 
         static readonly HttpClient client = new();
         public static Plugin? GetPluginWithVersion(SupportPlugin type, BukkitVersion bukkitVersion)
