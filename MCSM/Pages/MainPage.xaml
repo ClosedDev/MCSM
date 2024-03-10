@@ -17,7 +17,7 @@
         </ScrollViewer>
         <Button Content="FuncBukkitVersions" Margin="826,630,0,0" VerticalAlignment="Top" Height="37"/>
         <ui:TextBox x:Name="tbx" KeyDown="TextBox_TextEntered" HorizontalAlignment="Left" Margin="298,532,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="923"/>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="440,10,19,170">
+        <ScrollViewer x:Name="LoggerScroll" VerticalScrollBarVisibility="Auto" Margin="440,10,19,170">
             <TextBlock x:Name="TextView" Text="" Background="Transparent" Foreground="White" />
         </ScrollViewer>
     </Grid>

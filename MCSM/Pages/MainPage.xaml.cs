@@ -73,6 +73,7 @@ namespace MCSM.Pages
             await Dispatcher.InvokeAsync(() =>
             {
                 TextView.Text = TextView.Text + "\n" + newText;
+                LoggerScroll.ScrollToBottom();
             });
         }
 

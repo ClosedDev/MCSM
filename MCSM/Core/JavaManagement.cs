@@ -75,20 +75,17 @@ namespace MCSM.Core
         
         public event EventHandler<ProcessOnOutPutEventArgs> ProcessOnOutPutEvent;
         
-        public class ProcessOnOutPutEventArgs : EventArgs
+        public class ProcessOnOutPutEventArgs(string text) : EventArgs
         {
-            public string Text { get; }
-
-            public ProcessOnOutPutEventArgs(string text)
-            {
-                Text = text;
-            }
+            public string Text { get; } = text;
         }
 
         private void OutputDataReceivedHandler(object sender, DataReceivedEventArgs e)
         {
             this.ProcessOnOutPutEvent -= Core.mainPage.onProcessOutPut;
             this.ProcessOnOutPutEvent += Core.mainPage.onProcessOutPut;
+            
+            ProcessOnOutPutEvent?.Invoke(this, new ProcessOnOutPutEventArgs(e.Data));
         }
 
         public async Task Run(string argments, string workingDirectory)
