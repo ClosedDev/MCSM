@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -11,13 +12,18 @@ namespace MCSM.Core.Utils
 {
     static class Downloader
     {
-        async public static Task Download(string url, string dir)
+        async public static Task Download(string url, string dir, string brackets = "", string naming = "")
         {
             await Task.Run(async () =>
             {
                 try
                 {
-                    Logger.WriteLog(Logger.LogLv.info, "Downloading.." + url);
+                    var name = naming == string.Empty ? naming : $" {naming}";
+                    Logger.WriteLog(Logger.LogLv.info, $"Downloading{name}... : {url}", brackets);
+                    
+                    var stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    
                     using (HttpClient httpClient = new HttpClient())
                     {
                         var result = await httpClient.GetAsync(url);
@@ -31,6 +37,9 @@ namespace MCSM.Core.Utils
                             }
                         }
                     }
+                    
+                    stopwatch.Stop();
+                    Logger.WriteLog(Logger.LogLv.info, $"Download{name} Complete ( {stopwatch.ElapsedMilliseconds}ms )");
                 }
                 catch (HttpRequestException ex)
                 {

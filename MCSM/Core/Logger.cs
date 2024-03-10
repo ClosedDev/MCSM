@@ -16,18 +16,22 @@ namespace MCSM.Core
 
         static Queue<string> logQueue = new Queue<string>();
         private static readonly object writeLock = new object();
+        private static readonly string logFile = Core.MCSMAppdata + @"\log.log";
 
-        public static void WriteLog(LogLv lv, string str)
+        public static void WriteLog(LogLv lv, string str, string brackets = "")
         {
-            Debug.WriteLine(str);
-            logQueue.Enqueue(str);
+            var bracket = brackets == string.Empty ? brackets : "[ " + brackets + " ] ";
+            var logStr = $"{bracket}{str}";
+            
+            Debug.WriteLine(logStr);
+            logQueue.Enqueue(logStr);
             {
                 lock (writeLock)
                 {
                     StreamWriter fw;
 
-                    if (!File.Exists("log.log")) fw = File.CreateText("log.log");
-                    else fw = File.AppendText("log.log");
+                    if (!File.Exists(logFile)) fw = File.CreateText(logFile);
+                    else fw = File.AppendText(logFile);
 
                     while (logQueue.Count > 0)
                     {
@@ -40,8 +44,8 @@ namespace MCSM.Core
                         string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
                         string log = logQueue.Dequeue();
-                        fw.WriteLine($"[{lv.ToString()}] [{now}] [ at {fileName}.cs line {fileLine} in {funcName}() ] : {str}");
-                        if (lv == LogLv.fatal) MessageBox.Show("Fatal Error occurred!!!\n" + str, "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
+                        fw.WriteLine($"[{lv.ToString()}] [{now}] [ at {fileName}.cs line {fileLine} in {funcName}() ] : {logStr}");
+                        if (lv == LogLv.fatal) MessageBox.Show("Fatal Error occurred!!!\n" + logStr, "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
 
                     fw.Close();

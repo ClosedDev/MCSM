@@ -12,7 +12,7 @@ namespace MCSM.Core
 
         public static IniObject Settings = null;
         public static string MCSMAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MCSM\";
-        private static string SettingsFile = MCSMAppdata + "\\settings.ini";
+        private static string SettingsFile = MCSMAppdata + "settings.ini";
 
         public static void Load()
         {
@@ -23,7 +23,7 @@ namespace MCSM.Core
                 stopwatch.Start();
                 
                 BukkitVersionManagement.LoadBukkitVersions();
-
+                
                 stopwatch.Stop();
                 Logger.WriteLog(Logger.LogLv.info,
                     $"Loaded Paper version information ( Length: {BukkitVersionManagement.BukkitVersions.Length} ) ( {stopwatch.ElapsedMilliseconds}ms )");

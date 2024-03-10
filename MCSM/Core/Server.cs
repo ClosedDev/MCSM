@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Windows;
@@ -58,12 +59,12 @@ namespace MCSM.Core
 
                 // Plugin
                 Directory.CreateDirectory(this.dir + @"\Plugins");
-                this.plugin.Add(Plugin.GetPluginWithVersion(SupportPlugin.WORLDEDIT, this.bukkitVersion));
+                this.plugin.Add(Plugin.GetPluginWithVersion(SupportPlugin.WORLDEDIT, this.bukkitVersion)); //TODO: For Debug
                 foreach (var element in this.plugin)
                 {
                     if (element.info.type == PluginType.SUPPORT)
                     {
-                        await Downloader.Download(element.info.url, this.dir + @"\Plugins\" + element.info.dir);
+                        await Downloader.Download(element.info.url, this.dir + @"\Plugins\" + element.info.dir, "CREATE SERVER", element.info.name);
                     }
                     else
                     {
@@ -74,27 +75,32 @@ namespace MCSM.Core
 
                 // Bukkit
                 var url = $"https://api.papermc.io/v2/projects/paper/versions/{this.bukkitVersion.VER}/builds/{build.Build}/downloads/paper-{this.bukkitVersion.VER}-{build.Build}.jar";
-                Logger.WriteLog(Logger.LogLv.info, $"[ CREATE SERVER ] Downloading bukkit... : {url}");
+                await Downloader.Download(url, this.dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar", "CREATE SERVER", "bukkit");
+                
+                // Properties
+                this.properties = new ServerProperties("so=sow\nthis=fordebug"); //TODO: For Debug
+                File.WriteAllText(this.dir + @"\server.properties", this.properties.ToString());
 
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                await Downloader.Download(url, this.dir + $@"\bukkit-{this.bukkitVersion.ToString()}.jar");
-                stopwatch.Stop();
-
-                Logger.WriteLog(Logger.LogLv.info, $"[ CREATE SERVER ] Download Complete ( {stopwatch.ElapsedMilliseconds}ms )");
-
-                // Checking
+                // Java
                 var iniText = File.ReadAllText(this.dir + @"\info.ini");
                 IniObject ini = new(iniText);
-
+    
+                // Get Java Version
+                ZipFile.ExtractToDirectory($@"{this.dir}\bukkit-{this.bukkitVersion.ToString()}.jar", $@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR");
+                var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\version.json"));
+                var javaVersion = int.Parse(obj["java_version"].ToString());
+                Directory.Delete($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\", true);
+                
+                // Running
+                Logger.WriteLog(Logger.LogLv.info, $"{javaVersion}");
                 Logger.WriteLog(Logger.LogLv.info, $"Running Server with argment: java {ini["bukkit"]["argment"]}");
 
-                Java java = new(17);
+                Java java = new(javaVersion);
 
                 Core.CurrentRunningJava = java;
-
-                await java.Download();
-                java.Run(ini["bukkit"]["argment"], this.dir);
+                
+                if (!java.CheckAvailableToRun()) await java.Download();
+                await java.Run(ini["bukkit"]["argment"], this.dir);
 
                 /*while (true)
                 {
@@ -105,7 +111,7 @@ namespace MCSM.Core
             {
                 serverStopWatch.Stop();
 
-                Logger.WriteLog(Logger.LogLv.error, $"[ CREATE SERVER ] Create Server is ended with error!: {e}");
+                Logger.WriteLog(Logger.LogLv.error, $"Create Server is ended with error!: {e}", "CREATE SERVER");
                 MessageBox.Show($"알 수 없는 오류가 발생했습니다. : '{e}'", "MCSM Core", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

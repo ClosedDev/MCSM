@@ -51,21 +51,50 @@ namespace MCSM.Core
             { Properties.SPAWN_MOSTERS, "spawn-monsters" },
             { Properties.SPAWN_PROTECTION, "spawn-protection" }
         };
+        
+        private readonly Dictionary<string, string> values;
+        
+        public ServerProperties()
+        {
+            values = [];
+        }
 
-        private readonly Dictionary<string, string> dict = [];
+        public ServerProperties(string valueStr)
+        {
+            values = [];
+            
+            var lines = valueStr.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrEmpty(line) || line.StartsWith(';')) continue;
+                var keyValue = line.Split('=');
+
+                if (keyValue.Length == 2)
+                {
+                    values.Add(keyValue[0].Trim(), keyValue[1].Trim().Replace("\"", ""));
+                }
+            }
+        }
+
+        public ServerProperties(Dictionary<string, string> preset)
+        {
+            values = preset;
+        }
+        
 
         public string this[string key]
         {
-            get => dict[key];
-            set => dict[key] = value;
+            get => values[key];
+            set => values[key] = value;
         }
 
         public override string ToString()
         {
             var builder = new StringBuilder();
-            foreach (var element in dict)
+            foreach (var element in values)
             {
-                builder.Append(string.Format("{0}={1}\n", element.Key, element.Value));
+                builder.Append($"{element.Key}={element.Value}\n");
             }
             return builder.ToString();
         }
