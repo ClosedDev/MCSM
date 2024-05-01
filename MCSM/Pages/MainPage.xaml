@@ -10,15 +10,10 @@
       Title="MainPage">
 
     <Grid>
-        <Button Content="FuncTest" VerticalAlignment="Top" Click="Button_Click" Margin="1181,630,0,0" Height="34"/>
-        <Button Content="ShowNewPage" Margin="1031,630,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.004,-0.474" Click="Button_Click_1" Height="34"/>
+        <Button Content="서버 만들기" VerticalAlignment="Top" Click="Make_Server" Margin="640,521,0,0" Height="34"/>
         <ScrollViewer Margin="0,110,1006,0">
             <StackPanel x:Name="ScrollPanel"/>
         </ScrollViewer>
-        <Button Content="FuncBukkitVersions" Margin="826,630,0,0" VerticalAlignment="Top" Height="37"/>
-        <ui:TextBox x:Name="tbx" KeyDown="TextBox_TextEntered" HorizontalAlignment="Left" Margin="298,532,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="923"/>
-        <ScrollViewer x:Name="LoggerScroll" VerticalScrollBarVisibility="Auto" Margin="440,10,19,170">
-            <TextBlock x:Name="TextView" Text="" Background="Transparent" Foreground="White" />
-        </ScrollViewer>
+        <ui:Button Content="ServerConsole" Margin="364,608,0,0" VerticalAlignment="Top" Click="Navigate_ServerConsole"/>
     </Grid>
 </Page>

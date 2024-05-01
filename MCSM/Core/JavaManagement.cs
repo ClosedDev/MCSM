@@ -82,13 +82,13 @@ namespace MCSM.Core
 
         private void OutputDataReceivedHandler(object sender, DataReceivedEventArgs e)
         {
-            this.ProcessOnOutPutEvent -= Core.mainPage.onProcessOutPut;
-            this.ProcessOnOutPutEvent += Core.mainPage.onProcessOutPut;
+            this.ProcessOnOutPutEvent -= Core.serverConsole.onProcessOutPut;
+            this.ProcessOnOutPutEvent += Core.serverConsole.onProcessOutPut;
             
             ProcessOnOutPutEvent?.Invoke(this, new ProcessOnOutPutEventArgs(e.Data));
         }
 
-        public async Task Run(string argments, string workingDirectory)
+        public async Task Run(string argments, string workingDirectory, bool isTest = false)
         {
             if (!CheckAvailableToRun()) throw new Exception("This Java is not available to Run.");
 
@@ -105,9 +105,13 @@ namespace MCSM.Core
             await Task.Run(() =>
             {
                 process = Process.Start(psi);
-                
+
+                process.PriorityClass = ProcessPriorityClass.High;
+
                 process.OutputDataReceived -= OutputDataReceivedHandler;
                 process.OutputDataReceived += OutputDataReceivedHandler;
+
+                // if (isTest) InputString("stop");
 
                 process.BeginOutputReadLine();
             });

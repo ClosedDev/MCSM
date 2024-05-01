@@ -1,5 +1,6 @@
 ﻿using MCSM.Core;
 using Ookii.Dialogs.Wpf;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,10 +18,9 @@ namespace MCSM.Pages
         {
             Logger.WriteLog(Logger.LogLv.info, "The main page is displayed.");
             InitializeComponent();
-            Core.Core.mainPage = this;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Make_Server(object sender, RoutedEventArgs e)
         {
             string dir;
 
@@ -44,7 +44,7 @@ namespace MCSM.Pages
                 return;
             }
 
-            ServerBuilder builder = new(dir, new BukkitVersion("1.20.4"));
+            ServerBuilder builder = new(dir, new BukkitVersion("1.10.2"));
             Server s = builder
                 .SetNoGUI(false)
                 .SetRAM(4000)
@@ -52,10 +52,10 @@ namespace MCSM.Pages
 
             MessageBox.Show(s.bukkitVersion.ToString(), "MCSM Core");
 
-            s.Create(false);
+            await s.Create(false);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        /*private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             ScrollPanel.Children.Add(new TextBlock
             {
@@ -66,30 +66,11 @@ namespace MCSM.Pages
                 TextAlignment = TextAlignment.Center,
                 FontSize = 20f
             });
-        }
+        }*/
 
-        public async Task UpdateUI(string newText)
+        private void Navigate_ServerConsole(object sender, RoutedEventArgs e)
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                TextView.Text = TextView.Text + "\n" + newText;
-                LoggerScroll.ScrollToBottom();
-            });
-        }
-
-        public void onProcessOutPut(object sender, Java.ProcessOnOutPutEventArgs e)
-        {
-            Logger.WriteLog(Logger.LogLv.info, e.Text);
-            UpdateUI(e.Text);
-        }
-
-        private void TextBox_TextEntered(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Return)
-            {
-                Core.Core.CurrentRunningJava.InputString(tbx.Text);
-                tbx.Text = "";
-            }
+            Core.Core.mainWindow.navigatePage("/Pages/ServerConsole.xaml");
         }
     }
 }

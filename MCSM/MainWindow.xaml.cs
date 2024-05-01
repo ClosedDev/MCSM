@@ -14,6 +14,7 @@ namespace MCSM
         public MainWindow()
         {
             InitializeComponent();
+            Core.Core.mainWindow = this;
         }
 
         private void mainWindow_Closed(object sender, EventArgs e)
@@ -26,14 +27,19 @@ namespace MCSM
             Logger.WriteLog(Logger.LogLv.info, "Application Closing...");
         }
 
-        private void mainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Core.Core.Load();
-
             Wpf.Ui.Appearance.Watcher.Watch(
                 this,
                 Wpf.Ui.Appearance.BackgroundType.Mica,
                 true);
+
+            await Core.Core.Load();
+        }
+
+        public void navigatePage(string src)
+        {
+            main_frame.Navigate(src);
         }
     }
 }

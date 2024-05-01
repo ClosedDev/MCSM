@@ -7,16 +7,17 @@ namespace MCSM.Core
 {
     public static class Core
     {
-        public static MainPage mainPage { get; set; }
+        public static ServerConsole serverConsole { get; set; }
+        public static MainWindow mainWindow { get; set; }
         public static Java CurrentRunningJava { get; set; }
 
         public static IniObject Settings = null;
         public static string MCSMAppdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MCSM\";
         private static string SettingsFile = MCSMAppdata + "settings.ini";
 
-        public static void Load()
+        public async static Task Load()
         {
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 Logger.WriteLog(Logger.LogLv.info, "Loading version information from Paper...");
                 Stopwatch stopwatch = new Stopwatch();
@@ -28,8 +29,8 @@ namespace MCSM.Core
                 Logger.WriteLog(Logger.LogLv.info,
                     $"Loaded Paper version information ( Length: {BukkitVersionManagement.BukkitVersions.Length} ) ( {stopwatch.ElapsedMilliseconds}ms )");
             });
-            
-            Task.Run(() =>
+
+            await Task.Run(() =>
             {
                 Logger.WriteLog(Logger.LogLv.info, "Loading version information from Adoptium...");
                 Stopwatch stopwatch = new Stopwatch();

@@ -2,12 +2,15 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Windows;
 using static MCSM.Core.Plugin;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MCSM.Core
 {
@@ -27,7 +30,7 @@ namespace MCSM.Core
             this.bukkitVersion = bukkitVersion;
         }
 
-        public async void Create(bool ignoreNotEmpty = false)  // 폴더의 빈 여부를 무시/무시하지 않음
+        public async Task Create(bool ignoreNotEmpty = false)  // 폴더의 빈 여부를 무시/무시하지 않음
         {
             Stopwatch serverStopWatch = new Stopwatch();
             serverStopWatch.Start();
@@ -84,28 +87,44 @@ namespace MCSM.Core
                 // Java
                 var iniText = File.ReadAllText(this.dir + @"\info.ini");
                 IniObject ini = new(iniText);
-    
+
                 // Get Java Version
+                Logger.WriteLog(Logger.LogLv.info, "Get java version from bukkit..");
                 ZipFile.ExtractToDirectory($@"{this.dir}\bukkit-{this.bukkitVersion.ToString()}.jar", $@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR");
-                var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\version.json"));
-                var javaVersion = int.Parse(obj["java_version"].ToString());
+                var javaVersion = 0;
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\version.json"));
+                    javaVersion = int.Parse(obj["java_version"].ToString());
+                } catch
+                {
+                    string[] subDirectories = Directory.GetDirectories($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\META-INF\maven\io.papermc\");
+
+                    foreach (string subDirectory in subDirectories)
+                    {
+                        Regex regex = new Regex(@"\d+");
+                        Match match = regex.Match(subDirectory);
+                        if (match.Success) javaVersion = int.Parse(match.Value);
+                    }
+
+                    if (javaVersion == 0) throw new Exception("Java version not recognized.");
+                }
                 Directory.Delete($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\", true);
                 
                 // Running
                 Logger.WriteLog(Logger.LogLv.info, $"{javaVersion}");
-                Logger.WriteLog(Logger.LogLv.info, $"Running Server with argment: java {ini["bukkit"]["argment"]}");
+                Logger.WriteLog(Logger.LogLv.info, $"Testing Server with argment: java {ini["bukkit"]["argment"]}");
 
                 Java java = new(javaVersion);
 
                 Core.CurrentRunningJava = java;
                 
                 if (!java.CheckAvailableToRun()) await java.Download();
-                await java.Run(ini["bukkit"]["argment"], this.dir);
+                await java.Run(ini["bukkit"]["argment"], this.dir, true); // 주의: 프로세스 종료까지 await Sleep이 작동되지 않음
 
-                /*while (true)
-                {
-                    Logger.WriteLog(Logger.LogLv.info, java.GetJavaPrintLine());
-                }*/
+                serverStopWatch.Stop();
+
+                Logger.WriteLog(Logger.LogLv.info, "Server Create Ended! ( " + serverStopWatch.ElapsedMilliseconds.ToString() + "ms )");
 
             } catch (Exception e)
             {

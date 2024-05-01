@@ -15,7 +15,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Terminal\" />
+    <Compile Remove="Core\Terminal\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Core\Terminal\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Core\Terminal\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Core\Terminal\**" />
   </ItemGroup>
 
 </Project>
