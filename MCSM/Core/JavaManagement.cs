@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Windows.Threading;
+using MCSM.Pages;
 using Newtonsoft.Json;
 
 namespace MCSM.Core
@@ -73,7 +75,7 @@ namespace MCSM.Core
             VERSION = version;
         }
         
-        public event EventHandler<ProcessOnOutPutEventArgs> ProcessOnOutPutEvent;
+        /*public event EventHandler<ProcessOnOutPutEventArgs> ProcessOnOutPutEvent;
         
         public class ProcessOnOutPutEventArgs(string text) : EventArgs
         {
@@ -86,22 +88,59 @@ namespace MCSM.Core
             this.ProcessOnOutPutEvent += Core.serverConsole.onProcessOutPut;
             
             ProcessOnOutPutEvent?.Invoke(this, new ProcessOnOutPutEventArgs(e.Data));
+        }*/
+
+        public event EventHandler<ProcessOutputEventArgs> ProcessOutputEvent;
+
+        public class ProcessOutputEventArgs(string text) : EventArgs
+        {
+            public string Text = text;
+        }
+        
+        private void ProcessOutputEventHandler(object sender, DataReceivedEventArgs e)
+        {
+            ProcessOutputEvent?.Invoke(this, new ProcessOutputEventArgs(e.Data));
         }
 
         public async Task Run(string argments, string workingDirectory, bool isTest = false)
         {
             if (!CheckAvailableToRun()) throw new Exception("This Java is not available to Run.");
 
-            ProcessStartInfo psi = new();
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = Core.MCSMAppdata + @$"jdks\{this.buildVersion}\bin\javaw.exe",
+                    Arguments = argments,
+                    WorkingDirectory = workingDirectory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+            process.OutputDataReceived += ProcessOutputEventHandler;
+            process.ErrorDataReceived += ProcessOutputEventHandler;
+            ProcessOutputEvent += Core.serverConsole.ProcessOutputEvent;
+
+            await Task.Run(() =>
+            {
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+            });
+
+
+            /*ProcessStartInfo psi = new();
             psi.FileName = Core.MCSMAppdata + @$"jdks\{this.buildVersion}\bin\javaw.exe";
             Debug.WriteLine(psi.FileName);
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardInput = true;
             psi.CreateNoWindow = true;
-            psi.Arguments = argments; 
+            psi.Arguments = argments;
             Debug.WriteLine(psi.Arguments);
             psi.WorkingDirectory = workingDirectory;
-            
+
             await Task.Run(() =>
             {
                 process = Process.Start(psi);
@@ -114,7 +153,7 @@ namespace MCSM.Core
                 // if (isTest) InputString("stop");
 
                 process.BeginOutputReadLine();
-            });
+            });*/
         }
 
         public void InputString(string input)

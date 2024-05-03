@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MCSM.Core.Utils;
 
 namespace MCSM.Pages
 {
@@ -23,8 +24,10 @@ namespace MCSM.Pages
     {
         public ServerConsole()
         {
+            Logger.WriteLog(Logger.LogLv.info, "The console 시발ㅇ page is displayed.");
             InitializeComponent();
-            Core.Core.serverConsole = this;
+            Core.Core.serverConsole = this; //TODO 이 씨1발 이거 좆2같ㅇ은거좀 리팩토링 해야할듯
+            //TODO 코어에서 모든 인스턴스 관리하는거 너무 불안정함
         }
 
         public async Task UpdateUI(string newText)
@@ -36,7 +39,7 @@ namespace MCSM.Pages
             });
         }
 
-        public void onProcessOutPut(object sender, Java.ProcessOnOutPutEventArgs e)
+        public void ProcessOutputEvent(object? sender, Java.ProcessOutputEventArgs e)
         {
             Logger.WriteLog(Logger.LogLv.info, e.Text);
             UpdateUI(e.Text);

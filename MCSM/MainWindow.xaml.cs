@@ -37,9 +37,9 @@ namespace MCSM
             await Core.Core.Load();
         }
 
-        public void navigatePage(string src)
+        public void navigatePage(object content)
         {
-            main_frame.Navigate(src);
+            main_frame.Navigate(content);
         }
     }
 }

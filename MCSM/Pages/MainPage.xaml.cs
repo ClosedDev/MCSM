@@ -44,7 +44,7 @@ namespace MCSM.Pages
                 return;
             }
 
-            ServerBuilder builder = new(dir, new BukkitVersion("1.10.2"));
+            ServerBuilder builder = new(dir, new BukkitVersion("1.20.4"));
             Server s = builder
                 .SetNoGUI(false)
                 .SetRAM(4000)
@@ -70,7 +70,7 @@ namespace MCSM.Pages
 
         private void Navigate_ServerConsole(object sender, RoutedEventArgs e)
         {
-            Core.Core.mainWindow.navigatePage("/Pages/ServerConsole.xaml");
+            Core.Core.mainWindow.navigatePage(new ServerConsole());
         }
     }
 }

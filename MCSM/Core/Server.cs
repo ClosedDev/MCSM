@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Windows;
+using MCSM.Pages;
 using static MCSM.Core.Plugin;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -110,7 +111,7 @@ namespace MCSM.Core
                     if (javaVersion == 0) throw new Exception("Java version not recognized.");
                 }
                 Directory.Delete($@"{this.dir}\TEMP-BUKKIT-UNZIPPED-JAR\", true);
-                
+
                 // Running
                 Logger.WriteLog(Logger.LogLv.info, $"{javaVersion}");
                 Logger.WriteLog(Logger.LogLv.info, $"Testing Server with argment: java {ini["bukkit"]["argment"]}");
