@@ -71,7 +71,7 @@ namespace MCSM.Core
 
             string ver = string.Format("{0}.{1}", bukkitVersion.Ver, bukkitVersion.Major);
 
-            using (HttpRequestMessage req = new(HttpMethod.Get, string.Format("{0}plugins/{1}", "http://mcsm.closeddev.kro.kr/", PluginInfo.plugins[type].Item1.ToLower().Replace(" ", "-"))))
+            using (HttpRequestMessage req = new(HttpMethod.Get, string.Format("{0}plugins/{1}", "http://api-dev.kro.kr/", PluginInfo.plugins[type].Item1.ToLower().Replace(" ", "-"))))
             using (var response = client.Send(req))
             using (Stream stream = response.Content.ReadAsStream())
             using (StreamReader reader = new(stream))
