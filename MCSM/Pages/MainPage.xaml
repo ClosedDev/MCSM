@@ -10,10 +10,21 @@
       Title="MainPage">
 
     <Grid>
-        <Button Content="서버 만들기" VerticalAlignment="Top" Click="Make_Server" Margin="640,521,0,0" Height="34"/>
-        <ScrollViewer Margin="0,110,1006,0">
-            <StackPanel x:Name="ScrollPanel"/>
+        <Button Content="새로운 서버 만들기" VerticalAlignment="Top" Click="Navigate_MakeServer" Margin="906,38,0,0" Height="34" Width="231"/>
+        <ScrollViewer Margin="10,132,969,10">
+            <TextBox Text="HELLO!!!!" Width="240" Height="40" TextAlignment="Center" FontSize="20"/>
         </ScrollViewer>
-        <ui:Button Content="ServerConsole" Margin="364,608,0,0" VerticalAlignment="Top" Click="Navigate_ServerConsole"/>
+        <Image Source="/Pages/logo.png" Margin="10,10,969,581"/>
+        <ui:Button Content="🅰️" Margin="381,34,0,0" VerticalAlignment="Top" Width="40" Height="40" Click="Navigate_ServerConsole"/>
+        <ui:Button Content="🅱️" Margin="450,34,0,0" VerticalAlignment="Top" Width="40" Height="40"/>
+        <ui:Button Content="🍕" Margin="518,34,0,0" VerticalAlignment="Top" Width="40" Height="40"/>
+        <ui:Button Content="💕" Margin="585,34,0,0" VerticalAlignment="Top" Width="40" Height="40"/>
+        <Grid Margin="381,132,10,10">
+            <Button Content="서버 실행하기" VerticalAlignment="Top" Click="Run_Server" Height="34" Width="571" Margin="0,428,0,0"/>
+            <Button Content="서버 편집하기" VerticalAlignment="Top" Click="Edit_Server" Height="34" Width="144" Margin="610,428,0,0"/>
+            <Grid Margin="0,10,10,136">
+
+            </Grid>
+        </Grid>
     </Grid>
 </Page>

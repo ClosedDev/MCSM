@@ -30,4 +30,12 @@
     <None Remove="Core\Terminal\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Pages\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Pages\logo.png" />
+  </ItemGroup>
+
 </Project>

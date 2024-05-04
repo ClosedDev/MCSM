@@ -20,7 +20,7 @@ namespace MCSM.Pages
             InitializeComponent();
         }
 
-        private async void Make_Server(object sender, RoutedEventArgs e)
+        /*private async void Make_Server(object sender, RoutedEventArgs e)
         {
             string dir;
 
@@ -53,7 +53,7 @@ namespace MCSM.Pages
             MessageBox.Show(s.bukkitVersion.ToString(), "MCSM Core");
 
             await s.Create(false);
-        }
+        }*/
 
         /*private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -68,9 +68,24 @@ namespace MCSM.Pages
             });
         }*/
 
+        private void Run_Server(object sender, RoutedEventArgs e)
+        { 
+        
+        }
+
+        private void Edit_Server(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void Navigate_ServerConsole(object sender, RoutedEventArgs e)
         {
             Core.Core.mainWindow.navigatePage(new ServerConsole());
+        }
+
+        private void Navigate_MakeServer(object sender, RoutedEventArgs e)
+        {
+            Core.Core.mainWindow.navigatePage(new MakeServerPage());
         }
     }
 }
